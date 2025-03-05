@@ -88,7 +88,7 @@ xuk = val_tensor
 [actual_L3, predicted_L3] = debug_L3(xuk, Num_meas, model)
 [actual_L4, predicted_L4] = debug_L4(xuk, Num_meas, model)
 [actual_L5, predicted_L5] = debug_L5(xuk, Num_meas, S_p, model)
-#[actual_L6, predicted_L6] = debug_L6(xuk, Num_meas, Num_x_Obsv, T, model)
+[actual_L6, predicted_L6] = debug_L6(xuk, Num_meas, Num_x_Obsv, T, model)
 
 sample_indices = r.sample(range(xuk.shape[0]), 3)
 
@@ -129,7 +129,7 @@ for i, idx in enumerate(sample_indices):
 plt.tight_layout()
 plt.show()
 
-fig, axs = plt.subplots(2, 3, figsize=(18, 8), sharex=True, sharey=True)
+fig, axs = plt.subplots(3, 3, figsize=(18, 8), sharex=True, sharey=True)
 
 for i, idx in enumerate(sample_indices):
 
@@ -153,6 +153,14 @@ for i, idx in enumerate(sample_indices):
     axs[1, i].set_xlabel("Time step")
     axs[1, i].set_ylabel("x2")
     axs[1, i].legend()
+
+    # Plot x2 in the second row
+    axs[2, i].plot(time_steps, actual_traj[:, 2].cpu().numpy(), 'o-', label='True $\mathrm{x_{2,m+1}}$')
+    axs[2, i].plot(time_steps, predicted_traj[:, 2].detach().cpu().numpy(), 'x--', label='Predicted $\mathrm{\phi^{-1}(K^m\phi(x_{2,0}))}$')
+    axs[2, i].set_title(f"gu validation, Sample {idx} (u)")
+    axs[2, i].set_xlabel("Time step")
+    axs[2, i].set_ylabel("u")
+    axs[2, i].legend()
 
 plt.tight_layout()
 plt.show()
@@ -255,7 +263,7 @@ for i, idx in enumerate(sample_indices):
     # Plot x1 in the first row
     axs[0, i].plot(time_steps, actual_traj[:, 0].cpu().numpy(), 'o-', label='True $\mathrm{x_{1,m+1}}$')
     axs[0, i].plot(time_steps, predicted_traj[:, 0].detach().cpu().numpy(), 'x--', label='Predicted $\mathrm{\phi^{-1}(K^m\phi(x_{1,0}))}$')
-    axs[0, i].set_title(f"Koopman validation, Sample {idx} (x1)")
+    axs[0, i].set_title(f"L5 validation, Sample {idx} (x1)")
     axs[0, i].set_xlabel("Time step")
     axs[0, i].set_ylabel("x1")
     axs[0, i].legend()
@@ -263,10 +271,46 @@ for i, idx in enumerate(sample_indices):
     # Plot Y2 in the second row
     axs[1, i].plot(time_steps, actual_traj[:, 1].cpu().numpy(), 'o-', label='True $\mathrm{x_{2,m+1}}$')
     axs[1, i].plot(time_steps, predicted_traj[:, 1].detach().cpu().numpy(), 'x--', label='Predicted $\mathrm{\phi^{-1}(K^m\phi(x_{2,0}))}$')
-    axs[1, i].set_title(f"Koopman validation, Sample {idx} (x2)")
+    axs[1, i].set_title(f"L5 validation, Sample {idx} (x2)")
     axs[1, i].set_xlabel("Time step")
     axs[1, i].set_ylabel("x2")
     axs[1, i].legend()
+
+plt.tight_layout()
+plt.show()
+
+fig, axs = plt.subplots(3, 3, figsize=(18, 8), sharex=True, sharey=True)
+
+for i, idx in enumerate(sample_indices):
+
+    predicted_traj = predicted_L6[idx]
+    actual_traj = actual_L6[idx]
+
+    time_steps = range(actual_L6.shape[1])
+
+    # Plot x1 in the first row
+    axs[0, i].plot(time_steps, actual_traj[:, 0].detach().cpu().numpy(), 'o-', label='True Y1$')
+    axs[0, i].plot(time_steps, predicted_traj[:, 0].detach().cpu().numpy(), 'x--', label='Predicted Y1')
+    axs[0, i].set_title(f"L6 validation, Sample {idx} (Y1)")
+    axs[0, i].set_xlabel("Time step")
+    axs[0, i].set_ylabel("Y1")
+    axs[0, i].legend()
+
+    # Plot x2 in the second row
+    axs[1, i].plot(time_steps, actual_traj[:, 1].detach().cpu().numpy(), 'o-', label='True Y2$')
+    axs[1, i].plot(time_steps, predicted_traj[:, 1].detach().cpu().numpy(), 'x--', label='Predicted Y2$')
+    axs[1, i].set_title(f"L6 validation, Sample {idx} (Y2)")
+    axs[1, i].set_xlabel("Time step")
+    axs[1, i].set_ylabel("Y2")
+    axs[1, i].legend()
+
+    # Plot x2 in the second row
+    axs[2, i].plot(time_steps, actual_traj[:, 2].detach().cpu().numpy(), 'o-', label='True Y3$')
+    axs[2, i].plot(time_steps, predicted_traj[:, 2].detach().cpu().numpy(), 'x--', label='Predicted Y3$')
+    axs[2, i].set_title(f"L6 validation, Sample {idx} (Y3)")
+    axs[2, i].set_xlabel("Time step")
+    axs[2, i].set_ylabel("Y3")
+    axs[2, i].legend()
 
 plt.tight_layout()
 plt.show()
