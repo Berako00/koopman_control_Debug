@@ -35,7 +35,7 @@ def enc_self_feeding(model, xuk, Num_meas):
     for m in range(0, num_steps-1):
 
         v = model.u_Encoder(torch.cat((x_k, u[:, m, :]), dim=1))
-        y_k = model.x_Koopman_op(model.x_Encoder(y_k)) + model.u_Koopman_op(v)
+        y_k = model.x_Koopman_op(y_k) + model.u_Koopman_op(v)
         x_k = model.x_Decoder(y_k)
         predictions.append(x_k)
 
