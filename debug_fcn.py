@@ -43,6 +43,10 @@ def debug_L5(xuk, Num_meas, S_p, model):
 def debug_L6(xuk, Num_meas, Num_x_Obsv, T, model):
     prediction = torch.zeros(xuk.shape[0], T, Num_x_Obsv, dtype=torch.float32)
     actual = torch.zeros(xuk.shape[0], T, Num_x_Obsv, dtype=torch.float32)
+
+    actual[:, 0 ,:] = model.x_Encoder(xuk[:, 0, :Num_meas])
+    actual[:, T-1 ,:] = model.x_Encoder(xuk[:, T-1, :Num_meas])
+
     u = xuk[:, :, Num_meas:]
     prediction[:, 0, :] = model.x_Encoder(xuk[:, 0, :Num_meas])
     y_k = model.x_Koopman_op(model.x_Encoder(xuk[:, 0, :Num_meas])) + model.u_Koopman_op(model.u_Encoder(xuk[:, 0, :]))
@@ -50,10 +54,10 @@ def debug_L6(xuk, Num_meas, Num_x_Obsv, T, model):
     x_k = model.x_Decoder(y_k)
 
     for m in range(1, T-1):
+        actual[:, m ,:] = model.x_Encoder(xuk[:, m, :Num_meas])
         v = model.u_Encoder(torch.cat((x_k, u[:, m, :]), dim=1))
-        y_k = model.x_Koopman_op(model.x_Encoder(y_k)) + model.u_Koopman_op(v)
+        y_k = model.x_Koopman_op(y_k) + model.u_Koopman_op(v)
         x_k = model.x_Decoder(y_k)
         prediction[:, m+1, :] = y_k
-        actual[:, m+1, :] = xuk[:, m+1, :Num_meas]
 
     return actual, prediction
