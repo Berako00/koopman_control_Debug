@@ -35,7 +35,7 @@ def debug_L5(xuk, Num_meas, S_p, model):
 
     for m in range(1, S_p):
         xukh = torch.cat((x_k, u[:, m, :]), dim=1)
-        x_k  = model.x_Decoder(model.x_Koopman_op(model.x_Encoder(x_k) + model.u_Koopman_op(model.u_Encoder(xukh))))
+        x_k  = model.x_Decoder(model.x_Koopman_op(model.x_Encoder(x_k)) + model.u_Koopman_op(model.u_Encoder(xukh)))
         prediction[:, m+1, :] = x_k
 
     return actual, prediction
